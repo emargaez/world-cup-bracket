@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Cup 2026 Bracket Pool</title>
+  <style>
+    :root {
+      --bg: #0a1628;
+      --surface: #122240;
+      --surface2: #1a2f52;
+      --border: #2a4570;
+      --text: #e8eef7;
+      --muted: #8fa3c4;
+      --accent: #00c853;
+      --accent2: #ffd600;
+      --danger: #ff5252;
+      --correct: #00e676;
+      --wrong: #ff6e6e;
+      --pending: #5c7a9e;
+      --gold: #ffc107;
+      --radius: 10px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0d2137 0%, #1a3a6b 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+
+    .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+
+    .sync-status {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .sync-status.live { color: var(--accent); border-color: var(--accent); }
+    .sync-status.offline { color: var(--muted); }
+    .sync-status.error { color: var(--danger); border-color: var(--danger); }
+    .sync-status.syncing { color: var(--accent2); border-color: var(--accent2); }
+
+    code.inline {
+      background: var(--surface2);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .setup-steps {
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding-left: 1.25rem;
+      line-height: 1.9;
+    }
+
+    .setup-steps strong { color: var(--text); }
+
+    #sheet-url-input { min-width: 280px; width: 100%; max-width: 520px; }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+
+    nav.tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    nav.tabs button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+
+    nav.tabs button:hover { border-color: var(--accent); color: var(--text); }
+    nav.tabs button.active {
+      background: var(--accent);
+      color: #042010;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent2);
+    }
+
+    .card h3 { font-size: 0.95rem; margin: 1rem 0 0.5rem; color: var(--muted); }
+
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+
+    label { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.3rem; }
+
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      min-width: 160px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button.btn {
+      background: var(--accent);
+      color: #042010;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    button.btn:hover { filter: brightness(1.1); }
+    button.btn.secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    button.btn.danger { background: var(--danger); color: #fff; }
+    button.btn.small { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge.r32 { background: #1e3a5f; color: #90caf9; }
+    .badge.r16 { background: #2e4a2e; color: #a5d6a7; }
+    .badge.qf  { background: #4a3e1e; color: #ffe082; }
+    .badge.sf  { background: #4a1e3e; color: #f48fb1; }
+    .badge.f   { background: #4a2e1e; color: #ffab91; }
+
+    /* Leaderboard */
+    table.lb {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    table.lb th, table.lb td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    table.lb th { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
+    table.lb tr:hover td { background: var(--surface2); }
+    table.lb .rank-1 td:first-child { color: var(--gold); font-weight: 700; }
+
+    .score-breakdown {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .score-pill {
+      background: var(--surface2);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .score-pill span { color: var(--accent); font-weight: 600; }
+
+    /* Bracket picks grid */
+    .bracket-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 1100px) {
+      .bracket-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .bracket-grid { grid-template-columns: 1fr; }
+    }
+
+    .round-col h3 {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--accent2);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .match-pick {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.82rem;
+    }
+
+    .match-pick .teams {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+
+    .match-pick select {
+      width: 100%;
+      min-width: unset;
+      font-size: 0.82rem;
+    }
+
+    .match-pick.correct { border-color: var(--correct); box-shadow: 0 0 0 1px var(--correct); }
+    .match-pick.wrong { border-color: var(--wrong); opacity: 0.85; }
+    .match-pick.pending { border-color: var(--pending); }
+
+    .match-pick .pts {
+      float: right;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* Tree visualization */
+    .tree-wrap {
+      overflow-x: auto;
+      padding: 1rem 0;
+    }
+
+    .bracket-tree {
+      display: flex;
+      gap: 0;
+      min-width: 1100px;
+      align-items: stretch;
+    }
+
+    .tree-round {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      min-width: 140px;
+      position: relative;
+      padding: 0 4px;
+    }
+
+    .tree-round[data-round="0"] .tree-match { margin: 3px 6px; }
+    .tree-round[data-round="1"] .tree-match { margin: 11px 6px; }
+    .tree-round[data-round="2"] .tree-match { margin: 35px 6px; }
+    .tree-round[data-round="3"] .tree-match { margin: 95px 6px; }
+    .tree-round[data-round="4"] .tree-match { margin: 220px 6px; }
+
+    .tree-round-label {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--accent2);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tree-match {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 4px 8px;
+      font-size: 0.72rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .tree-match.done { border-color: var(--accent); }
+    .tree-match .team-row {
+      padding: 0.3rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tree-match .team-row:last-child { border-bottom: none; }
+
+    .tree-match .team-row.winner {
+      background: rgba(0, 200, 83, 0.15);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .tree-match .team-row.loser { color: var(--muted); opacity: 0.6; }
+
+    .tree-match .flag { margin-right: 0.3rem; }
+
+    /* Player chips */
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .player-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem 0.3rem 1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .player-chip.active {
+      border-color: var(--accent);
+      background: rgba(0, 200, 83, 0.12);
+    }
+
+    .player-chip .del {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0 0.2rem;
+    }
+
+    .info-box {
+      background: rgba(0, 200, 83, 0.08);
+      border: 1px solid rgba(0, 200, 83, 0.3);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .info-box strong { color: var(--accent); }
+
+    .scoring-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .scoring-table th, .scoring-table td {
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .scoring-table th { background: var(--surface2); color: var(--muted); }
+
+    .admin-match {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .admin-match:last-child { border-bottom: none; }
+
+    .admin-match .vs { color: var(--muted); font-size: 0.75rem; }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--accent);
+      color: #042010;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .champion-banner {
+      text-align: center;
+      padding: 1rem;
+      background: linear-gradient(135deg, #3d2e00, #1a2f52);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    .champion-banner .trophy { font-size: 2rem; }
+    .champion-banner h2 { color: var(--gold); margin-top: 0.25rem; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    body.locked #app-content {
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .passcode-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      padding: 1.5rem;
+    }
+
+    .passcode-gate.hidden { display: none; }
+
+    .passcode-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .passcode-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.35rem;
+      color: var(--accent2);
+    }
+
+    .passcode-card p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .passcode-card input {
+      width: 100%;
+      min-width: unset;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+    }
+
+    .passcode-card .remember {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .passcode-card .remember input {
+      width: auto;
+      margin: 0;
+      letter-spacing: normal;
+    }
+
+    .passcode-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      min-height: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .lock-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      margin-left: 0.75rem;
+    }
+
+    .lock-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    .player-bar {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-end;
+    }
+
+    .player-bar .remember-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+
+    .player-bar .remember-inline input { width: auto; min-width: unset; margin: 0; }
+
+    nav.picks-subtabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    nav.picks-subtabs button {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    nav.picks-subtabs button.active {
+      background: var(--accent2);
+      color: #1a1500;
+      border-color: var(--accent2);
+      font-weight: 600;
+    }
+
+    .picks-view { display: none; }
+    .picks-view.active { display: block; }
+
+    .tree-match.correct-pick { border-color: var(--correct); }
+    .tree-match.wrong-pick { border-color: var(--wrong); }
+
+    .tree-match .team-row.picked:not(.winner) {
+      opacity: 0.55;
+    }
+
+    .pick-champion-banner {
+      text-align: center;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #1a2f52, #0d2137);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    .pick-champion-banner strong { color: var(--accent2); }
+
+    .lb .view-bracket {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: inherit;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .lb .view-bracket:hover { color: var(--accent2); }
+
+    .picks-progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .picks-progress span { color: var(--accent); font-weight: 600; }
+  </style>
+</head>
+<body class="locked">
+  <div id="passcode-gate" class="passcode-gate">
+    <div class="passcode-card">
+      <h2>🔒 Bracket Pool</h2>
+      <p>Enter the passcode your host shared with the group.</p>
+      <input type="password" id="passcode-input" placeholder="Passcode" autocomplete="off">
+      <label class="remember">
+        <input type="checkbox" id="passcode-remember" checked>
+        Remember this device for 30 days
+      </label>
+      <button class="btn" id="passcode-submit" style="width:100%">Enter</button>
+      <div id="passcode-error" class="passcode-error"></div>
+    </div>
+  </div>
+
+  <div id="app-content">
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>⚽ World Cup 2026 Bracket Picks!!!⚽ </h1>
+        <p>
+          Round of 32 → Final · Live Google Sheets sync
+          <button type="button" class="lock-btn" id="lock-btn" title="Lock pool">🔒 Lock</button>
+        </p>
+      </div>
+      <span id="sync-status" class="sync-status offline">● Not connected</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav class="tabs">
+      <button class="active" data-tab="bracket">Bracket Tree</button>
+      <button data-tab="picks">My Picks</button>
+      <button data-tab="leaderboard">Leaderboard</button>
+      <button data-tab="players">Players</button>
+      <button data-tab="admin">Results (Admin)</button>
+      <button data-tab="export">Google Sheets</button>
+    </nav>
+
+    <!-- BRACKET TREE -->
+    <section id="panel-bracket" class="panel active">
+      <div id="champion-banner" class="champion-banner" style="display:none"></div>
+      <div class="info-box">
+        Live bracket for <strong>actual results</strong> — enter them in Admin (syncs via Google Sheets).
+        Everyone's picks update on the <strong>Leaderboard</strong> and <strong>My Picks</strong> tabs automatically.
+      </div>
+      <div class="tree-wrap">
+        <div id="bracket-tree" class="bracket-tree"></div>
+      </div>
+    </section>
+
+    <!-- MY PICKS -->
+    <section id="panel-picks" class="panel">
+      <div class="card">
+        <h2>My Bracket Picks</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">
+          Choose your name, then fill your bracket. Picks auto-advance each round — no manual setup.
+        </p>
+
+        <div class="player-bar row">
+          <div>
+            <label for="picks-player-select">I am playing as</label>
+            <select id="picks-player-select"></select>
+          </div>
+          <label class="remember-inline">
+            <input type="checkbox" id="remember-player" checked>
+            Remember me for 30 days
+          </label>
+        </div>
+
+        <div id="picks-progress" class="picks-progress"></div>
+
+        <nav class="picks-subtabs">
+          <button type="button" class="active" data-picks-view="bracket">📊 My Bracket</button>
+          <button type="button" data-picks-view="fill">✏️ Fill Picks</button>
+        </nav>
+
+        <div id="picks-bracket-view" class="picks-view active">
+          <div id="pick-champion-banner" class="pick-champion-banner" style="display:none"></div>
+          <div class="tree-wrap">
+            <div id="picks-bracket-tree" class="bracket-tree"></div>
+          </div>
+        </div>
+
+        <div id="picks-fill-view" class="picks-view">
+          <div id="picks-grid" class="bracket-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section id="panel-leaderboard" class="panel">
+      <div class="card">
+        <h2>Leaderboard</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">
+          Click a name to view that player's full bracket.
+        </p>
+        <table class="lb" id="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Total</th>
+              <th>R32</th>
+              <th>R16</th>
+              <th>QF</th>
+              <th>SF</th>
+              <th>Final</th>
+              <th>Champion</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scoring Formula</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">
+          Points are awarded only when your predicted winner matches the actual winner for that specific match.
+          Later rounds are worth more — classic bracket pool doubling system (max 80 pts + 32 champion bonus).
+        </p>
+        <table class="scoring-table">
+          <thead>
+            <tr><th>Round</th><th>Matches</th><th>Points each</th><th>Round max</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Round of 32</td><td>16</td><td>1</td><td>16</td></tr>
+            <tr><td>Round of 16</td><td>8</td><td>2</td><td>16</td></tr>
+            <tr><td>Quarterfinals</td><td>4</td><td>4</td><td>16</td></tr>
+            <tr><td>Semifinals</td><td>2</td><td>8</td><td>16</td></tr>
+            <tr><td>Final</td><td>1</td><td>16</td><td>16</td></tr>
+            <tr><td>Champion bonus</td><td>—</td><td>32</td><td>32</td></tr>
+            <tr style="font-weight:600;color:var(--accent)"><td colspan="3">Maximum possible</td><td>112</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="panel-players" class="panel">
+      <div class="card">
+        <h2>Manage Players</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">
+          Add everyone in your group. Once Google Sheets is connected, new players appear for everyone within ~15 seconds.
+        </p>
+        <div class="row" style="margin-bottom:1rem">
+          <div>
+            <label for="new-player-name">Player name</label>
+            <input type="text" id="new-player-name" placeholder="e.g. Lola" maxlength="40">
+          </div>
+          <div style="align-self:flex-end">
+            <button class="btn" id="add-player-btn">+ Add Player</button>
+          </div>
+        </div>
+        <div id="player-list" class="player-list"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="panel-admin" class="panel">
+      <div class="card">
+        <h2>Enter Actual Results</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">
+          Pick the winner for each completed match. Updates live for everyone when Google Sheets is connected.
+        </p>
+        <div id="admin-key-row" class="row" style="display:none;margin-bottom:1rem">
+          <div>
+            <label for="admin-key-input">Admin key (required to save results)</label>
+            <input type="password" id="admin-key-input" placeholder="Set in Apps Script + here" autocomplete="off">
+          </div>
+        </div>
+        <div id="admin-matches"></div>
+        <div class="row" style="margin-top:1rem">
+          <button class="btn danger" id="reset-results-btn">Reset All Results</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOOGLE SHEETS -->
+    <section id="panel-export" class="panel">
+      <div class="card">
+        <h2>🔗 Connect Google Sheets (live sync)</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">
+          Connect once — everyone's picks, results, and leaderboard sync live across all devices.
+        </p>
+        <div class="row" style="margin-bottom:0.75rem;align-items:flex-end">
+          <div style="flex:1">
+            <label for="sheet-url-input">Web App URL (from Apps Script deployment)</label>
+            <input type="url" id="sheet-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <button class="btn" id="connect-sheets-btn">Connect & Sync</button>
+          <button class="btn secondary" id="disconnect-sheets-btn">Disconnect</button>
+        </div>
+        <div class="row" style="gap:0.75rem;margin-bottom:0.75rem">
+          <button class="btn secondary" id="sync-now-btn">↻ Sync now</button>
+          <a class="btn secondary" id="sheet-link" href="#" target="_blank" rel="noopener" style="display:none;text-decoration:none">📊 Open Google Sheet</a>
+        </div>
+        <p id="sheets-connect-msg" style="color:var(--muted);font-size:0.85rem"></p>
+      </div>
+
+      <div class="card">
+        <h2>One-time setup (host only)</h2>
+        <ol class="setup-steps">
+          <li>Create a <a href="https://sheets.new" target="_blank" rel="noopener">new Google Sheet</a></li>
+          <li><strong>Extensions → Apps Script</strong> → delete default code → paste <code class="inline">google-apps-script/Code.gs</code> from this repo → Save</li>
+          <li>In Apps Script, select <code class="inline">setup</code> → <strong>Run</strong> (authorize when asked)</li>
+          <li><strong>Deploy → New deployment → Web app</strong><br>
+            Execute as: <strong>Me</strong> · Who has access: <strong>Anyone</strong></li>
+          <li>Copy the <strong>Web App URL</strong> → paste above → <strong>Connect & Sync</strong></li>
+          <li>Share the Sheet with your friends (view or edit). Share the bracket page link + passcode.</li>
+          <li>Optional: set <code class="inline">ADMIN_KEY</code> in Apps Script and below so only you can enter match results.</li>
+        </ol>
+        <div class="row" style="margin-top:1rem">
+          <div>
+            <label for="sheets-admin-key-config">Admin key (optional, for Results tab)</label>
+            <input type="password" id="sheets-admin-key-config" placeholder="Same as ADMIN_KEY in Apps Script" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Backup / Export</h2>
+        <div class="row" style="gap:0.75rem">
+          <button class="btn secondary" id="export-picks-csv">📥 Export Picks (CSV)</button>
+          <button class="btn secondary" id="export-scores-csv">📥 Export Leaderboard (CSV)</button>
+          <button class="btn secondary" id="export-results-csv">📥 Export Results (CSV)</button>
+          <button class="btn secondary" id="export-json">💾 Backup JSON</button>
+          <label class="btn secondary" style="cursor:pointer">
+            📂 Restore JSON
+            <input type="file" id="import-json" accept=".json" hidden>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>World Cup 2026 Bracket Pool · Synced via Google Sheets · Host on GitHub Pages</footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+  // ═══════════════════════════════════════════════════════════════
+  // CHANGE THIS before deploying — share only with your friend group
+  // ═══════════════════════════════════════════════════════════════
+  const POOL_PASSCODE = 'EAwc2026';
+  // Optional: pre-fill your deployed Apps Script URL so friends don't have to paste it
+  const SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwJbbr-MMRjWtbtV31OEWhHbm9gOGgGB7lBAr7uCQIdrb-P6lM2kgG8fY5g3dmSgyUoVw/exec';
+  // Optional: must match ADMIN_KEY in google-apps-script/Code.gs
+  const SHEETS_ADMIN_KEY = '';
+  // ═══════════════════════════════════════════════════════════════
+
+  (function initPasscode() {
+    const UNLOCK_KEY = 'wc2026_unlocked_until';
+    const gate = document.getElementById('passcode-gate');
+    const input = document.getElementById('passcode-input');
+    const errorEl = document.getElementById('passcode-error');
+    const remember = document.getElementById('passcode-remember');
+
+    function isUnlocked() {
+      const until = localStorage.getItem(UNLOCK_KEY);
+      if (!until) return false;
+      return Date.now() < Number(until);
+    }
+
+    function unlock(rememberDevice) {
+      gate.classList.add('hidden');
+      document.body.classList.remove('locked');
+      if (rememberDevice) {
+        const thirtyDays = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        localStorage.setItem(UNLOCK_KEY, String(thirtyDays));
+      } else {
+        sessionStorage.setItem('wc2026_session_unlocked', '1');
+      }
+      startApp();
+    }
+
+    function lock() {
+      localStorage.removeItem(UNLOCK_KEY);
+      sessionStorage.removeItem('wc2026_session_unlocked');
+      gate.classList.remove('hidden');
+      document.body.classList.add('locked');
+      input.value = '';
+      errorEl.textContent = '';
+      input.focus();
+    }
+
+    function tryUnlock() {
+      if (input.value === POOL_PASSCODE) {
+        unlock(remember.checked);
+        errorEl.textContent = '';
+      } else {
+        errorEl.textContent = 'Wrong passcode — check with your host.';
+        input.select();
+      }
+    }
+
+    document.getElementById('passcode-submit').addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    document.getElementById('lock-btn').addEventListener('click', lock);
+
+    if (isUnlocked() || sessionStorage.getItem('wc2026_session_unlocked')) {
+      gate.classList.add('hidden');
+      document.body.classList.remove('locked');
+      startApp();
+    } else {
+      input.focus();
+    }
+  })();
+
+  function startApp() {
+    if (startApp.started) return;
+    startApp.started = true;
+    'use strict';
+
+    const FLAGS = {
+      'South Africa': '🇿🇦', 'Canada': '🇨🇦', 'Brazil': '🇧🇷', 'Japan': '🇯🇵',
+      'Germany': '🇩🇪', 'Paraguay': '🇵🇾', 'Netherlands': '🇳🇱', 'Morocco': '🇲🇦',
+      'France': '🇫🇷', 'Sweden': '🇸🇪', 'Mexico': '🇲🇽', 'Ecuador': '🇪🇨',
+      'Ivory Coast': '🇨🇮', 'Norway': '🇳🇴', 'USA': '🇺🇸', 'Bosnia and Herzegovina': '🇧🇦',
+      'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'DR Congo': '🇨🇩', 'Belgium': '🇧🇪', 'Senegal': '🇸🇳',
+      'Spain': '🇪🇸', 'Austria': '🇦🇹', 'Portugal': '🇵🇹', 'Croatia': '🇭🇷',
+      'Switzerland': '🇨🇭', 'Algeria': '🇩🇿', 'Australia': '🇦🇺', 'Egypt': '🇪🇬',
+      'Argentina': '🇦🇷', 'Cape Verde': '🇨🇻', 'Colombia': '🇨🇴', 'Ghana': '🇬🇭',
+      'TBD': '❓'
+    };
+
+    const ROUND_NAMES = ['Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Final'];
+    const ROUND_SHORT = ['R32', 'R16', 'QF', 'SF', 'F'];
+    const ROUND_POINTS = [1, 2, 4, 8, 16];
+    const CHAMPION_BONUS = 32;
+
+    // Bracket structure: each match has id, round, teamA, teamB (R32 only), feedsFrom for later rounds
+  const R32_MATCHES = [
+      { id: 'm49', teamA: 'South Africa', teamB: 'Canada' },
+      { id: 'm50', teamA: 'Brazil', teamB: 'Japan' },
+      { id: 'm51', teamA: 'Germany', teamB: 'Paraguay' },
+      { id: 'm52', teamA: 'Netherlands', teamB: 'Morocco' },
+      { id: 'm53', teamA: 'France', teamB: 'Sweden' },
+      { id: 'm54', teamA: 'Mexico', teamB: 'Ecuador' },
+      { id: 'm55', teamA: 'Ivory Coast', teamB: 'Norway' },
+      { id: 'm56', teamA: 'USA', teamB: 'Bosnia and Herzegovina' },
+      { id: 'm57', teamA: 'England', teamB: 'DR Congo' },
+      { id: 'm58', teamA: 'Belgium', teamB: 'Senegal' },
+      { id: 'm59', teamA: 'Switzerland', teamB: 'Algeria' },
+      { id: 'm60', teamA: 'Australia', teamB: 'Egypt' },
+      { id: 'm61', teamA: 'Spain', teamB: 'Austria' },
+      { id: 'm62', teamA: 'Portugal', teamB: 'Croatia' },
+      { id: 'm63', teamA: 'Argentina', teamB: 'Cape Verde' },
+      { id: 'm64', teamA: 'Colombia', teamB: 'Ghana' }
+    ];
+
+    // Knockout tree: winners feed into next round
+    const BRACKET_TREE = [
+      // R16
+      { id: 'r16-1', round: 1, feeds: ['m49', 'm50'] },
+      { id: 'r16-2', round: 1, feeds: ['m53', 'm54'] },
+      { id: 'r16-3', round: 1, feeds: ['m57', 'm58'] },
+      { id: 'r16-4', round: 1, feeds: ['m61', 'm62'] },
+      { id: 'r16-5', round: 1, feeds: ['m51', 'm52'] },
+      { id: 'r16-6', round: 1, feeds: ['m55', 'm56'] },
+      { id: 'r16-7', round: 1, feeds: ['m59', 'm60'] },
+      { id: 'r16-8', round: 1, feeds: ['m63', 'm64'] },
+      // QF
+      { id: 'qf-1', round: 2, feeds: ['r16-1', 'r16-2'] },
+      { id: 'qf-2', round: 2, feeds: ['r16-3', 'r16-4'] },
+      { id: 'qf-3', round: 2, feeds: ['r16-5', 'r16-6'] },
+      { id: 'qf-4', round: 2, feeds: ['r16-7', 'r16-8'] },
+      // SF
+      { id: 'sf-1', round: 3, feeds: ['qf-1', 'qf-2'] },
+      { id: 'sf-2', round: 3, feeds: ['qf-3', 'qf-4'] },
+      // Final
+      { id: 'final', round: 4, feeds: ['sf-1', 'sf-2'] }
+    ];
+
+    const ALL_MATCHES = [
+      ...R32_MATCHES.map((m, i) => ({ ...m, round: 0, label: `R32 #${i + 1}` })),
+      ...BRACKET_TREE.map(m => ({ ...m, teamA: null, teamB: null, label: ROUND_NAMES[m.round] }))
+    ];
+
+    const MATCH_BY_ID = Object.fromEntries(ALL_MATCHES.map(m => [m.id, m]));
+
+    const STORAGE_KEY = 'wc2026_bracket_pool_v1';
+    const MY_PLAYER_KEY = 'wc2026_my_player_id';
+    const MY_PLAYER_UNTIL_KEY = 'wc2026_my_player_until';
+
+    let state = loadState();
+    let picksView = 'bracket';
+    let pollTimer = null;
+    let lastLocalEdit = 0;
+    let sheetMeta = { sheetUrl: '' };
+
+    const SHEETS_URL_KEY = 'wc2026_sheets_url';
+    const SHEETS_ADMIN_KEY_STORAGE = 'wc2026_sheets_admin_key';
+
+    function getWebAppUrl() {
+      const fromInput = document.getElementById('sheet-url-input');
+      const inputVal = fromInput ? fromInput.value.trim() : '';
+      return inputVal || localStorage.getItem(SHEETS_URL_KEY) || SHEETS_WEB_APP_URL || '';
+    }
+
+    function getAdminKey() {
+      const cfg = document.getElementById('sheets-admin-key-config');
+      const adminInput = document.getElementById('admin-key-input');
+      return (adminInput && adminInput.value) ||
+        (cfg && cfg.value) ||
+        localStorage.getItem(SHEETS_ADMIN_KEY_STORAGE) ||
+        SHEETS_ADMIN_KEY ||
+        '';
+    }
+
+    function isSheetsEnabled() {
+      return !!getWebAppUrl();
+    }
+
+    function setSyncStatus(mode, detail) {
+      const el = document.getElementById('sync-status');
+      if (!el) return;
+      el.className = 'sync-status ' + mode;
+      const labels = {
+        live: '● Live sync',
+        offline: '● Not connected',
+        error: '● Sync error',
+        syncing: '● Syncing…'
+      };
+      el.textContent = detail || labels[mode] || labels.offline;
+    }
+
+    function updateSheetsUI() {
+      const url = getWebAppUrl();
+      const input = document.getElementById('sheet-url-input');
+      if (input && !input.value && url) input.value = url;
+
+      const adminCfg = document.getElementById('sheets-admin-key-config');
+      const storedAdmin = localStorage.getItem(SHEETS_ADMIN_KEY_STORAGE) || SHEETS_ADMIN_KEY;
+      if (adminCfg && storedAdmin) adminCfg.value = storedAdmin;
+
+      const adminRow = document.getElementById('admin-key-row');
+      const needsAdmin = isSheetsEnabled() && !!(storedAdmin || SHEETS_ADMIN_KEY);
+      if (adminRow) adminRow.style.display = needsAdmin ? 'flex' : 'none';
+
+      const adminInput = document.getElementById('admin-key-input');
+      if (adminInput && storedAdmin && !adminInput.value) adminInput.value = storedAdmin;
+
+      const link = document.getElementById('sheet-link');
+      if (link && sheetMeta.sheetUrl) {
+        link.href = sheetMeta.sheetUrl;
+        link.style.display = 'inline-block';
+      }
+
+      const msg = document.getElementById('sheets-connect-msg');
+      if (msg) {
+        msg.textContent = isSheetsEnabled()
+          ? 'Connected — picks and scores refresh every 15 seconds for everyone.'
+          : 'Not connected — data stays on this device only.';
+      }
+
+      setSyncStatus(isSheetsEnabled() ? 'live' : 'offline');
+    }
+
+    async function sheetsGetAll() {
+      const base = getWebAppUrl().replace(/\/$/, '');
+      const res = await fetch(base + '?action=getAll&t=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+
+    async function sheetsPost(body) {
+      const res = await fetch(getWebAppUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data.ok && data.error) throw new Error(data.error);
+      return data;
+    }
+
+    function applyRemoteData(data) {
+      const prevActive = state.activePlayerId;
+      state.players = (data.players || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        picks: (data.picks && data.picks[p.id]) ? { ...data.picks[p.id] } : {}
+      }));
+      if (!state.players.length) {
+        state.players = [{ id: uid(), name: 'Player 1', picks: {} }];
+      }
+      state.results = { ...(data.results || {}) };
+      state.activePlayerId = state.players.some(p => p.id === prevActive)
+        ? prevActive
+        : state.players[0].id;
+      applyRememberedPlayer(state);
+      if (data.sheetUrl) sheetMeta.sheetUrl = data.sheetUrl;
+      saveState();
+    }
+
+    async function pullFromSheets(silent) {
+      if (!isSheetsEnabled()) return;
+      try {
+        setSyncStatus('syncing');
+        const data = await sheetsGetAll();
+        if (!data.ok) throw new Error(data.error || 'Sync failed');
+        applyRemoteData(data);
+        renderAll();
+        setSyncStatus('live');
+        updateSheetsUI();
+      } catch (err) {
+        setSyncStatus('error', '● ' + err.message);
+        if (!silent) toast('Sync failed: ' + err.message);
+      }
+    }
+
+    function startPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      if (!isSheetsEnabled()) return;
+      pollTimer = setInterval(() => {
+        if (Date.now() - lastLocalEdit < 2500) return;
+        pullFromSheets(true);
+      }, 15000);
+    }
+
+    async function connectSheets() {
+      const url = document.getElementById('sheet-url-input').value.trim();
+      if (!url) { toast('Paste your Web App URL'); return; }
+      localStorage.setItem(SHEETS_URL_KEY, url);
+
+      const adminKey = document.getElementById('sheets-admin-key-config').value.trim();
+      if (adminKey) localStorage.setItem(SHEETS_ADMIN_KEY_STORAGE, adminKey);
+
+      await pullFromSheets(false);
+      if (!isSheetsEnabled()) return;
+      startPolling();
+      toast('Connected to Google Sheets!');
+    }
+
+    function disconnectSheets() {
+      localStorage.removeItem(SHEETS_URL_KEY);
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = null;
+      sheetMeta.sheetUrl = '';
+      document.getElementById('sheet-url-input').value = '';
+      const link = document.getElementById('sheet-link');
+      if (link) link.style.display = 'none';
+      updateSheetsUI();
+      toast('Disconnected — using local data only');
+    }
+
+    async function syncPickToSheets(player, matchId, value) {
+      lastLocalEdit = Date.now();
+      const clearMatchIds = getDownstreamMatchIds(matchId);
+      await sheetsPost({
+        action: 'savePick',
+        playerId: player.id,
+        matchId,
+        pick: value || '',
+        clearMatchIds
+      });
+    }
+
+    async function syncResultToSheets(matchId, value) {
+      lastLocalEdit = Date.now();
+      const clearMatchIds = getDownstreamMatchIds(matchId);
+      await sheetsPost({
+        action: 'saveResult',
+        matchId,
+        winner: value || '',
+        clearMatchIds,
+        adminKey: getAdminKey()
+      });
+    }
+
+    function applyRememberedPlayer(s) {
+      const until = localStorage.getItem(MY_PLAYER_UNTIL_KEY);
+      const playerId = localStorage.getItem(MY_PLAYER_KEY);
+      if (!until || !playerId || Date.now() >= Number(until)) {
+        localStorage.removeItem(MY_PLAYER_KEY);
+        localStorage.removeItem(MY_PLAYER_UNTIL_KEY);
+        return;
+      }
+      if (s.players.some(p => p.id === playerId)) {
+        s.activePlayerId = playerId;
+      }
+    }
+
+    function rememberActivePlayer() {
+      const remember = document.getElementById('remember-player');
+      if (remember && remember.checked && state.activePlayerId) {
+        const thirtyDays = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        localStorage.setItem(MY_PLAYER_KEY, state.activePlayerId);
+        localStorage.setItem(MY_PLAYER_UNTIL_KEY, String(thirtyDays));
+      } else {
+        localStorage.removeItem(MY_PLAYER_KEY);
+        localStorage.removeItem(MY_PLAYER_UNTIL_KEY);
+      }
+    }
+
+    function defaultState() {
+      return {
+        players: [{ id: uid(), name: 'Player 1', picks: {} }],
+        activePlayerId: null,
+        results: {}
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const s = JSON.parse(raw);
+          if (!s.activePlayerId && s.players?.length) s.activePlayerId = s.players[0].id;
+          applyRememberedPlayer(s);
+          return s;
+        }
+      } catch (_) {}
+      const s = defaultState();
+      s.activePlayerId = s.players[0].id;
+      applyRememberedPlayer(s);
+      return s;
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function uid() {
+      return 'p_' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function flag(team) {
+      return (FLAGS[team] || '🏳️') + ' ';
+    }
+
+    function getWinner(matchId, picksOrResults) {
+      return picksOrResults[matchId] || null;
+    }
+
+    function getTeamsForMatch(matchId, picksOrResults) {
+      const m = MATCH_BY_ID[matchId];
+      if (!m) return ['TBD', 'TBD'];
+
+      if (m.round === 0) {
+        return [m.teamA, m.teamB];
+      }
+
+      const [feedA, feedB] = m.feeds;
+      const teamA = getWinner(feedA, picksOrResults) || 'TBD';
+      const teamB = getWinner(feedB, picksOrResults) || 'TBD';
+      return [teamA, teamB];
+    }
+
+    function allMatchIds() {
+      return ALL_MATCHES.map(m => m.id);
+    }
+
+    function matchPoints(round) {
+      return ROUND_POINTS[round] || 0;
+    }
+
+    function scorePlayer(player) {
+      const picks = player.picks;
+      const results = state.results;
+      const byRound = [0, 0, 0, 0, 0];
+      let total = 0;
+      let championCorrect = false;
+
+      for (const m of ALL_MATCHES) {
+        const actual = results[m.id];
+        const predicted = picks[m.id];
+        if (!actual || !predicted) continue;
+        if (actual === predicted) {
+          const pts = matchPoints(m.round);
+          byRound[m.round] += pts;
+          total += pts;
+        }
+      }
+
+      const finalWinner = results['final'];
+      const championPick = picks['final'];
+      if (finalWinner && championPick && championPick === finalWinner) {
+        championCorrect = true;
+        total += CHAMPION_BONUS;
+      }
+
+      return { total, byRound, championCorrect, championBonus: championCorrect ? CHAMPION_BONUS : 0 };
+    }
+
+    function getActivePlayer() {
+      return state.players.find(p => p.id === state.activePlayerId) || state.players[0];
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+  // --- RENDER: Bracket Tree ---
+    function buildRoundMatches() {
+      const rounds = [[], [], [], [], []];
+      for (const m of R32_MATCHES) rounds[0].push({ ...m, round: 0 });
+      for (const m of BRACKET_TREE) rounds[m.round].push(m);
+      return rounds;
+    }
+
+    function renderBracketTreeContainer(container, data, options = {}) {
+      const { compareResults = false } = options;
+      const rounds = buildRoundMatches();
+
+      container.innerHTML = rounds.map((matches, ri) => {
+        if (!matches.length) return '';
+        return `
+          <div class="tree-round" data-round="${ri}">
+            <div class="tree-round-label">${ROUND_SHORT[ri]}</div>
+            ${matches.map(m => renderTreeMatch(m, data, compareResults)).join('')}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderBracketTree() {
+      renderBracketTreeContainer(
+        document.getElementById('bracket-tree'),
+        state.results,
+        { compareResults: false }
+      );
+
+      const finalWinner = state.results['final'];
+      const banner = document.getElementById('champion-banner');
+      if (finalWinner) {
+        banner.style.display = 'block';
+        banner.innerHTML = `
+          <div class="trophy">🏆</div>
+          <h2>${flag(finalWinner)}${finalWinner}</h2>
+          <p style="color:var(--muted);font-size:0.85rem">World Cup 2026 Champion</p>
+        `;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function renderTreeMatch(m, data, compareResults) {
+      const [teamA, teamB] = getTeamsForMatch(m.id, data);
+      const winner = data[m.id];
+      const done = !!winner;
+      const actual = compareResults ? state.results[m.id] : null;
+
+      let matchClass = 'tree-match';
+      if (done) matchClass += ' done';
+      if (compareResults && actual) {
+        if (winner === actual) matchClass += ' correct-pick';
+        else matchClass += ' wrong-pick';
+      }
+
+      function row(team) {
+        const isWinner = winner === team;
+        const isLoser = done && winner !== team && team !== 'TBD';
+        let cls = 'team-row';
+        if (isWinner) cls += ' winner';
+        else if (isLoser) cls += ' loser';
+        if (done && !isWinner && team !== 'TBD') cls += ' picked';
+        return `<div class="${cls}"><span><span class="flag">${flag(team)}</span>${team}</span></div>`;
+      }
+
+      return `
+        <div class="${matchClass}" title="${m.label || m.id}">
+          ${row(teamA)}
+          ${row(teamB)}
+        </div>
+      `;
+    }
+
+    function renderPicksBracketTree() {
+      const player = getActivePlayer();
+      if (!player) return;
+
+      renderBracketTreeContainer(
+        document.getElementById('picks-bracket-tree'),
+        player.picks,
+        { compareResults: true }
+      );
+
+      const championPick = player.picks['final'];
+      const banner = document.getElementById('pick-champion-banner');
+      if (championPick) {
+        banner.style.display = 'block';
+        const actual = state.results['final'];
+        const correct = actual && championPick === actual;
+        banner.innerHTML = `
+          <strong>${player.name}'s champion pick:</strong>
+          ${flag(championPick)}${championPick}
+          ${actual ? (correct ? ' ✅ Correct!' : ' ❌ (actual: ' + flag(actual) + actual + ')') : ''}
+        `;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function renderPlayerSelector() {
+      const select = document.getElementById('picks-player-select');
+      const player = getActivePlayer();
+      select.innerHTML = state.players.map(p =>
+        `<option value="${p.id}" ${p.id === state.activePlayerId ? 'selected' : ''}>${p.name}</option>`
+      ).join('');
+
+      const remember = document.getElementById('remember-player');
+      const rememberedId = localStorage.getItem(MY_PLAYER_KEY);
+      const until = localStorage.getItem(MY_PLAYER_UNTIL_KEY);
+      remember.checked = !!(rememberedId && until && Date.now() < Number(until));
+
+      const filled = player ? Object.keys(player.picks).length : 0;
+      const total = ALL_MATCHES.length;
+      document.getElementById('picks-progress').innerHTML =
+        player ? `<span>${filled}</span> of ${total} matches picked` : '';
+    }
+
+    function setActivePlayer(playerId) {
+      state.activePlayerId = playerId;
+      rememberActivePlayer();
+      saveState();
+      renderPlayers();
+      renderPicksPanel();
+    }
+
+    function renderPicksPanel() {
+      renderPlayerSelector();
+      renderPicksBracketTree();
+      renderPicksGrid();
+    }
+
+    function switchToPlayerBracket(playerId) {
+      state.activePlayerId = playerId;
+      saveState();
+      picksView = 'bracket';
+      document.querySelectorAll('nav.picks-subtabs button').forEach(b => {
+        b.classList.toggle('active', b.dataset.picksView === 'bracket');
+      });
+      document.getElementById('picks-bracket-view').classList.add('active');
+      document.getElementById('picks-fill-view').classList.remove('active');
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('nav.tabs button[data-tab="picks"]').classList.add('active');
+      document.getElementById('panel-picks').classList.add('active');
+      renderPicksPanel();
+      renderPlayers();
+    }
+
+  // --- RENDER: Picks Grid ---
+    function renderPicksGrid() {
+      const player = getActivePlayer();
+      const grid = document.getElementById('picks-grid');
+      const rounds = buildRoundMatches();
+
+      grid.innerHTML = rounds.map((matches, ri) => `
+        <div class="round-col">
+          <h3>${ROUND_NAMES[ri]} <span class="badge ${ROUND_SHORT[ri].toLowerCase()}">${matchPoints(ri)}pt</span></h3>
+          ${matches.map(m => renderPickMatch(m, player)).join('')}
+        </div>
+      `).join('');
+    }
+
+    function renderPickMatch(m, player) {
+      const [teamA, teamB] = getTeamsForMatch(m.id, player.picks);
+      const pts = matchPoints(m.round);
+      const actual = state.results[m.id];
+      const predicted = player.picks[m.id];
+
+      let statusClass = 'pending';
+      if (actual && predicted) {
+        statusClass = predicted === actual ? 'correct' : 'wrong';
+      }
+
+      const ready = teamA !== 'TBD' && teamB !== 'TBD';
+      const options = ready
+        ? `<option value="">— pick winner —</option>
+           <option value="${teamA}" ${predicted === teamA ? 'selected' : ''}>${flag(teamA)}${teamA}</option>
+           <option value="${teamB}" ${predicted === teamB ? 'selected' : ''}>${flag(teamB)}${teamB}</option>`
+        : `<option value="">Waiting for previous round…</option>`;
+
+      return `
+        <div class="match-pick ${statusClass}" data-match="${m.id}">
+          <span class="pts">${pts} pt${pts > 1 ? 's' : ''}</span>
+          <div class="teams">${flag(teamA)}${teamA} vs ${flag(teamB)}${teamB}</div>
+          <select data-match-id="${m.id}" ${ready ? '' : 'disabled'}>
+            ${options}
+          </select>
+        </div>
+      `;
+    }
+
+    function onPickChange(matchId, value, player) {
+      if (value) {
+        player.picks[matchId] = value;
+      } else {
+        delete player.picks[matchId];
+      }
+
+      clearInvalidDownstream(player.picks, matchId);
+      saveState();
+      renderPicksPanel();
+      renderLeaderboard();
+
+      if (isSheetsEnabled()) {
+        syncPickToSheets(player, matchId, value).then(() => {
+          setSyncStatus('live');
+        }).catch(err => {
+          toast('Could not save pick: ' + err.message);
+          setSyncStatus('error');
+          pullFromSheets(true);
+        });
+      }
+    }
+
+    function getDownstreamMatchIds(matchId) {
+      const downstream = [];
+      const queue = [matchId];
+      while (queue.length) {
+        const id = queue.shift();
+        for (const m of BRACKET_TREE) {
+          if (m.feeds.includes(id) && !downstream.includes(m.id)) {
+            downstream.push(m.id);
+            queue.push(m.id);
+          }
+        }
+      }
+      return downstream;
+    }
+
+    function clearInvalidDownstream(picks, changedMatchId) {
+      for (const id of getDownstreamMatchIds(changedMatchId)) {
+        delete picks[id];
+      }
+    }
+
+  // --- RENDER: Leaderboard ---
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboard-body');
+      const scored = state.players.map(p => ({
+        player: p,
+        score: scorePlayer(p)
+      })).sort((a, b) => b.score.total - a.score.total);
+
+      tbody.innerHTML = scored.map((s, i) => {
+        const { total, byRound, championCorrect, championBonus } = s.score;
+        return `
+          <tr class="${i === 0 ? 'rank-1' : ''}">
+            <td>${i + 1}</td>
+            <td><button type="button" class="view-bracket" data-view-player="${s.player.id}">${s.player.name}</button></td>
+            <td><strong style="color:var(--accent)">${total}</strong></td>
+            <td>${byRound[0]}</td>
+            <td>${byRound[1]}</td>
+            <td>${byRound[2]}</td>
+            <td>${byRound[3]}</td>
+            <td>${byRound[4]}</td>
+            <td>${championCorrect ? '+' + championBonus + ' 🏆' : '—'}</td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="9" style="color:var(--muted)">Add players to get started</td></tr>';
+    }
+
+  // --- RENDER: Players ---
+    function renderPlayers() {
+      const list = document.getElementById('player-list');
+      list.innerHTML = state.players.map(p => `
+        <div class="player-chip ${p.id === state.activePlayerId ? 'active' : ''}" data-id="${p.id}">
+          ${p.name}
+          <button class="del" data-del="${p.id}" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+  // --- RENDER: Admin ---
+    function renderAdmin() {
+      const container = document.getElementById('admin-matches');
+      let html = '';
+
+      for (const ri of [0, 1, 2, 3, 4]) {
+        const matches = ri === 0
+          ? R32_MATCHES.map(m => ({ ...m, round: 0 }))
+          : BRACKET_TREE.filter(m => m.round === ri);
+
+        html += `<h3>${ROUND_NAMES[ri]}</h3>`;
+        for (const m of matches) {
+          const [teamA, teamB] = getTeamsForMatch(m.id, state.results);
+          const winner = state.results[m.id];
+          const ready = teamA !== 'TBD' && teamB !== 'TBD';
+
+          html += `
+            <div class="admin-match">
+              <span>${flag(teamA)}${teamA}</span>
+              <span class="vs">vs</span>
+              <span>${flag(teamB)}${teamB}</span>
+              <select data-result="${m.id}" ${ready ? '' : 'disabled'}>
+                <option value="">—</option>
+                ${ready ? `
+                  <option value="${teamA}" ${winner === teamA ? 'selected' : ''}>${teamA} wins</option>
+                  <option value="${teamB}" ${winner === teamB ? 'selected' : ''}>${teamB} wins</option>
+                ` : ''}
+              </select>
+            </div>
+          `;
+        }
+      }
+
+      container.innerHTML = html;
+    }
+
+    function onResultChange(matchId, value) {
+      if (value) {
+        state.results[matchId] = value;
+      } else {
+        delete state.results[matchId];
+      }
+      clearInvalidDownstream(state.results, matchId);
+      saveState();
+      renderAll();
+
+      if (isSheetsEnabled()) {
+        syncResultToSheets(matchId, value).then(() => {
+          setSyncStatus('live');
+        }).catch(err => {
+          toast('Could not save result: ' + err.message);
+          setSyncStatus('error');
+          pullFromSheets(true);
+        });
+      }
+    }
+
+  // --- Export ---
+    function downloadFile(filename, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function exportPicksCSV() {
+      const matchIds = allMatchIds();
+      const headers = ['Player', ...matchIds];
+      const rows = state.players.map(p => {
+        const [a, b] = [p.name, ...matchIds.map(id => p.picks[id] || '')];
+        return [p.name, ...matchIds.map(id => p.picks[id] || '')];
+      });
+      const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+      downloadFile('wc2026_picks.csv', csv, 'text/csv');
+      toast('Picks exported!');
+    }
+
+    function exportScoresCSV() {
+      const headers = ['Rank', 'Player', 'Total', 'R32', 'R16', 'QF', 'SF', 'Final', 'ChampionBonus'];
+      const scored = state.players.map(p => ({ player: p, score: scorePlayer(p) }))
+        .sort((a, b) => b.score.total - a.score.total);
+      const rows = scored.map((s, i) => [
+        i + 1, s.player.name, s.score.total,
+        ...s.score.byRound, s.score.championBonus
+      ]);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      downloadFile('wc2026_leaderboard.csv', csv, 'text/csv');
+      toast('Leaderboard exported!');
+    }
+
+    function exportResultsCSV() {
+      const headers = ['MatchID', 'Round', 'TeamA', 'TeamB', 'Winner'];
+      const rows = allMatchIds().map(id => {
+        const m = MATCH_BY_ID[id];
+        const [a, b] = getTeamsForMatch(id, state.results);
+        return [id, ROUND_NAMES[m.round], a, b, state.results[id] || ''];
+      });
+      const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      downloadFile('wc2026_results.csv', csv, 'text/csv');
+      toast('Results exported!');
+    }
+
+    function exportJSON() {
+      downloadFile('wc2026_backup.json', JSON.stringify(state, null, 2), 'application/json');
+      toast('Backup saved!');
+    }
+
+    function importJSON(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          state = JSON.parse(e.target.result);
+          saveState();
+          renderAll();
+          toast('Backup restored!');
+        } catch (_) {
+          toast('Invalid backup file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+  // --- Tabs ---
+    function initTabs() {
+      document.querySelectorAll('nav.tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+        });
+      });
+    }
+
+  // --- Event delegation ---
+    function initEvents() {
+      document.getElementById('add-player-btn').addEventListener('click', async () => {
+        const name = document.getElementById('new-player-name').value.trim();
+        if (!name) { toast('Enter a name'); return; }
+
+        if (isSheetsEnabled()) {
+          try {
+            setSyncStatus('syncing');
+            const res = await sheetsPost({ action: 'addPlayer', name });
+            await pullFromSheets(true);
+            if (res.player) state.activePlayerId = res.player.id;
+            rememberActivePlayer();
+            saveState();
+            document.getElementById('new-player-name').value = '';
+            renderAll();
+            toast(name + ' added!');
+          } catch (err) {
+            toast('Could not add player: ' + err.message);
+            setSyncStatus('error');
+          }
+          return;
+        }
+
+        const p = { id: uid(), name, picks: {} };
+        state.players.push(p);
+        state.activePlayerId = p.id;
+        document.getElementById('new-player-name').value = '';
+        rememberActivePlayer();
+        saveState();
+        renderAll();
+        toast(name + ' added!');
+      });
+
+      document.getElementById('new-player-name').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('add-player-btn').click();
+      });
+
+      document.getElementById('player-list').addEventListener('click', async e => {
+        const del = e.target.closest('[data-del]');
+        if (del) {
+          e.stopPropagation();
+          const id = del.dataset.del;
+          if (state.players.length <= 1) { toast('Need at least one player'); return; }
+
+          if (isSheetsEnabled()) {
+            try {
+              await sheetsPost({ action: 'removePlayer', playerId: id });
+              await pullFromSheets(true);
+              if (localStorage.getItem(MY_PLAYER_KEY) === id) rememberActivePlayer();
+              renderAll();
+            } catch (err) {
+              toast('Could not remove player: ' + err.message);
+            }
+            return;
+          }
+
+          state.players = state.players.filter(p => p.id !== id);
+          if (state.activePlayerId === id) state.activePlayerId = state.players[0].id;
+          if (localStorage.getItem(MY_PLAYER_KEY) === id) rememberActivePlayer();
+          saveState();
+          renderAll();
+          return;
+        }
+        const chip = e.target.closest('.player-chip');
+        if (chip) {
+          setActivePlayer(chip.dataset.id);
+        }
+      });
+
+      document.getElementById('picks-player-select').addEventListener('change', e => {
+        setActivePlayer(e.target.value);
+      });
+
+      document.getElementById('remember-player').addEventListener('change', () => {
+        rememberActivePlayer();
+        toast(document.getElementById('remember-player').checked ? 'Will remember you for 30 days' : 'Won\'t remember this device');
+      });
+
+      document.querySelectorAll('nav.picks-subtabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          picksView = btn.dataset.picksView;
+          document.querySelectorAll('nav.picks-subtabs button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('picks-bracket-view').classList.toggle('active', picksView === 'bracket');
+          document.getElementById('picks-fill-view').classList.toggle('active', picksView === 'fill');
+        });
+      });
+
+      document.getElementById('leaderboard-body').addEventListener('click', e => {
+        const btn = e.target.closest('[data-view-player]');
+        if (btn) switchToPlayerBracket(btn.dataset.viewPlayer);
+      });
+
+      document.getElementById('picks-grid').addEventListener('change', e => {
+        if (e.target.matches('select[data-match-id]')) {
+          const player = getActivePlayer();
+          onPickChange(e.target.dataset.matchId, e.target.value, player);
+        }
+      });
+
+      document.getElementById('admin-matches').addEventListener('change', e => {
+        if (e.target.matches('select[data-result]')) {
+          onResultChange(e.target.dataset.result, e.target.value);
+        }
+      });
+
+      document.getElementById('reset-results-btn').addEventListener('click', async () => {
+        if (!confirm('Clear all entered results? Player picks will be kept.')) return;
+
+        if (isSheetsEnabled()) {
+          try {
+            await sheetsPost({ action: 'clearResults', adminKey: getAdminKey() });
+            await pullFromSheets(true);
+            renderAll();
+            toast('Results reset');
+          } catch (err) {
+            toast('Could not reset: ' + err.message);
+          }
+          return;
+        }
+
+        state.results = {};
+        saveState();
+        renderAll();
+        toast('Results reset');
+      });
+
+      document.getElementById('connect-sheets-btn').addEventListener('click', connectSheets);
+      document.getElementById('disconnect-sheets-btn').addEventListener('click', disconnectSheets);
+      document.getElementById('sync-now-btn').addEventListener('click', () => pullFromSheets(false));
+
+      document.getElementById('sheets-admin-key-config').addEventListener('change', e => {
+        const v = e.target.value.trim();
+        if (v) localStorage.setItem(SHEETS_ADMIN_KEY_STORAGE, v);
+        else localStorage.removeItem(SHEETS_ADMIN_KEY_STORAGE);
+        updateSheetsUI();
+      });
+
+      document.getElementById('export-picks-csv').addEventListener('click', exportPicksCSV);
+      document.getElementById('export-scores-csv').addEventListener('click', exportScoresCSV);
+      document.getElementById('export-results-csv').addEventListener('click', exportResultsCSV);
+      document.getElementById('export-json').addEventListener('click', exportJSON);
+      document.getElementById('import-json').addEventListener('change', e => {
+        if (e.target.files[0]) importJSON(e.target.files[0]);
+        e.target.value = '';
+      });
+    }
+
+    function renderAll() {
+      renderBracketTree();
+      renderPicksPanel();
+      renderLeaderboard();
+      renderPlayers();
+      renderAdmin();
+    }
+
+    initTabs();
+    initEvents();
+    updateSheetsUI();
+    renderAll();
+
+    if (isSheetsEnabled()) {
+      pullFromSheets(true).then(() => startPolling());
+    }
+  }
+  </script>
+</body>
+</html>
