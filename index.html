@@ -964,33 +964,33 @@
     // Bracket structure: each match has id, round, teamA, teamB (R32 only), feedsFrom for later rounds
   const R32_MATCHES = [
       { id: 'm49', teamA: 'South Africa', teamB: 'Canada' },
-      { id: 'm50', teamA: 'Brazil', teamB: 'Japan' },
+      { id: 'm50', teamA: 'Netherlands', teamB: 'Morocco'  },
       { id: 'm51', teamA: 'Germany', teamB: 'Paraguay' },
-      { id: 'm52', teamA: 'Netherlands', teamB: 'Morocco' },
-      { id: 'm53', teamA: 'France', teamB: 'Sweden' },
-      { id: 'm54', teamA: 'Mexico', teamB: 'Ecuador' },
-      { id: 'm55', teamA: 'Ivory Coast', teamB: 'Norway' },
-      { id: 'm56', teamA: 'USA', teamB: 'Bosnia and Herzegovina' },
-      { id: 'm57', teamA: 'England', teamB: 'DR Congo' },
-      { id: 'm58', teamA: 'Belgium', teamB: 'Senegal' },
-      { id: 'm59', teamA: 'Switzerland', teamB: 'Algeria' },
-      { id: 'm60', teamA: 'Australia', teamB: 'Egypt' },
-      { id: 'm61', teamA: 'Spain', teamB: 'Austria' },
-      { id: 'm62', teamA: 'Portugal', teamB: 'Croatia' },
-      { id: 'm63', teamA: 'Argentina', teamB: 'Cape Verde' },
-      { id: 'm64', teamA: 'Colombia', teamB: 'Ghana' }
+      { id: 'm52', teamA: 'France', teamB: 'Sweden' },
+      { id: 'm53', teamA:  'Belgium', teamB: 'Senegal' },
+      { id: 'm54', teamA:  'USA', teamB: 'Bosnia and Herzegovina' },
+      { id: 'm55', teamA: 'Spain', teamB: 'Austria' },
+      { id: 'm56', teamA: 'Portugal', teamB: 'Croatia' },
+      { id: 'm57', teamA: 'Brazil', teamB: 'Japan' },
+      { id: 'm58', teamA: 'Ivory Coast', teamB: 'Norway' },
+      { id: 'm59', teamA: 'Mexico', teamB: 'Ecuador' },
+      { id: 'm60', teamA:  'England', teamB: 'DR Congo' },
+      { id: 'm61', teamA:  'Switzerland', teamB: 'Algeria' },
+      { id: 'm62', teamA: 'Colombia', teamB: 'Ghana' },
+      { id: 'm63', teamA:  'Australia', teamB: 'Egypt' },
+      { id: 'm64', teamA: 'Argentina', teamB: 'Cape Verde' },
     ];
-
+    
     // Knockout tree: winners feed into next round
     const BRACKET_TREE = [
       // R16
       { id: 'r16-1', round: 1, feeds: ['m49', 'm50'] },
-      { id: 'r16-2', round: 1, feeds: ['m53', 'm54'] },
-      { id: 'r16-3', round: 1, feeds: ['m57', 'm58'] },
-      { id: 'r16-4', round: 1, feeds: ['m61', 'm62'] },
-      { id: 'r16-5', round: 1, feeds: ['m51', 'm52'] },
-      { id: 'r16-6', round: 1, feeds: ['m55', 'm56'] },
-      { id: 'r16-7', round: 1, feeds: ['m59', 'm60'] },
+      { id: 'r16-2', round: 1, feeds: ['m51', 'm52'] },
+      { id: 'r16-3', round: 1, feeds: ['m53', 'm54'] },
+      { id: 'r16-4', round: 1, feeds: ['m55', 'm56'] },
+      { id: 'r16-5', round: 1, feeds: ['m57', 'm58'] },
+      { id: 'r16-6', round: 1, feeds: ['m59', 'm60'] },
+      { id: 'r16-7', round: 1, feeds: ['m61', 'm62'] },
       { id: 'r16-8', round: 1, feeds: ['m63', 'm64'] },
       // QF
       { id: 'qf-1', round: 2, feeds: ['r16-1', 'r16-2'] },
